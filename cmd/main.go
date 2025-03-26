@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -37,9 +38,16 @@ func init() {
 }
 
 func main() {
+
+	interval, err := strconv.Atoi(os.Getenv("INTERVAL"))
+	if err != nil {
+		log.Fatal("--- MUST BE A VALID INTERVAL ---", err.Error())
+		return
+	}
+
 	fmt.Printf("--- STARTING AUTOMATIC DNS SERVICE v%s ---\n", os.Getenv("VERSION"))
 	ctx, cancel := context.WithCancel(context.Background())
-	go StartDDNSService(ctx)
+	go StartDDNSService(ctx, interval)
 
 	// Wait for SIGNALS
 	sigChan := make(chan os.Signal, 1)
@@ -49,9 +57,9 @@ func main() {
 	cancel()
 }
 
-func StartDDNSService(ctx context.Context) {
+func StartDDNSService(ctx context.Context, interval int) {
 
-	ticker := time.NewTicker(20 * time.Minute)
+	ticker := time.NewTicker(time.Duration(interval) * time.Minute)
 	defer ticker.Stop()
 
 	for {
