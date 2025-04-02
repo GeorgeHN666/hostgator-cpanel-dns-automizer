@@ -80,73 +80,36 @@ go install
 ```
 
 3. **Set Up Environment Files**
-Create an `env/` folder and add the following files:
-- `.env`
-- `dev.local.env`
-- `prod.local.env`
+Create an `.env` file on the root folder `.env file already created. create it if needed`
 
 4. **.env Configuration**
-*Location: ./env/.env*
+*Location: .env*
 ```env
-ENV=DEV # or PROD
-VERSION=1.0.4 #current version
+VERSION=1.2.0 #current version
+INTERVAL=20
 
 PUBLIC_IP_CHECKER="https://ipv4.icanhazip.com" #url to check public ipv4 change to your taste.
 CONFIG_IP_REGISTRY_FILE="/Add/Your/Path/hostgator-cpanel-dns-automizer/config/ip.cfg"
 CONFIG_IP_REGISTRY_PATH="/Add/Your/Path/hostgator-cpanel-dns-automizer/config"
 ```
 
-5. **dev.local.env Configuration**
-*Location: ./env/dev.local.env*
-```env
+5. **Adding domains and configuration**
+Create a json file in the `./domains` folder. Inside the is going to be a example.txt with basic fields.
+```json
 
-# As a suggestion try it with a test domain to test it. 
-# Add the real domains to the prod.local.env file 
-
-#eg. admin:LS82SBDYH...
-REMOTE_REGISTRY_AUTH="addYourCpanelUsername:AddYourAPIToken" 
-
-#eg. maps.google.com / if you want to target A records starting
-#with www. dont add www. it will do it automatically
-REMOTE_REGISTRY_DOMAIN=otionalSubdomain.yourdomain.com # (Main domain) 
-
-#Add the name of the A record you want to update. make sure to
-#copy and paste it like is on the DNS Zone
-REMOTE_REGISTRY_TARGET=otionalSubdomain.targetDomain.com 
-
-# make sure to add your main domain where it says. adjust port if needed
-REMOTE_REGISTRY_LIST=https://replacewithyourdomain.com:2083/json-api/cpanel?cpanel_jsonapi_module=ZoneEdit&cpanel_jsonapi_func=fetchzone&domain=yourmaindomain.com 
-
-# make sure to add your main domain where it says. adjust port if needed
-REMOTE_RECORDS_REGISTRY_PATH=https://replacewithyourdomain.com:2083/json-api/cpanel?cpanel_jsonapi_module=ZoneEdit&cpanel_jsonapi_func=edit_zone_record&domain=
+{
+    "domain_name" : "your_domain",
+    "main_domain_url" : "your_domain.com",
+    "target_domains" : ["example.your_domain.com.","www.example.your_domain.com."],
+    "auth" : {
+        "username" : "cpanel_username",
+        "token" : "cpanel_token"
+    },
+    "cpanel_port" : 2083 // usually 2083 but check on DNS Zone url
+}
 ```
 
-6. **prod.local.env Configuration**
-*Location: ./env/prod.local.env*
-```env
-
-# PROD .env file uses the same variable but just replaced with the actual 
-# domain to be target. this file is used for production and not test
-
-#eg. admin:LS82SBDYH...
-REMOTE_REGISTRY_AUTH="addYourCpanelUsername:AddYourAPIToken" 
-
-#eg. maps.google.com / if you want to target A records starting
-#with www. dont add www. it will do it automatically
-REMOTE_REGISTRY_DOMAIN=otionalSubdomain.yourdomain.com # (Main domain) 
-
-#Add the name of the A record you want to update. make sure to
-#copy and paste it like is on the DNS Zone
-REMOTE_REGISTRY_TARGET=otionalSubdomain.targetDomain.com 
-
-# make sure to add your main domain where it says. adjust port if needed
-REMOTE_REGISTRY_LIST=https://replacewithyourdomain.com:2083/json-api/cpanel?cpanel_jsonapi_module=ZoneEdit&cpanel_jsonapi_func=fetchzone&domain=yourmaindomain.com 
-
-# make sure to add your main domain where it says. adjust port if needed
-REMOTE_RECORDS_REGISTRY_PATH=https://replacewithyourdomain.com:2083/json-api/cpanel?cpanel_jsonapi_module=ZoneEdit&cpanel_jsonapi_func=edit_zone_record&domain=
-```
-
-7. **Create a Makefile**
+6. **Create a Makefile**
 ```Makefile
 SERVICE_NAME=dns-automizer
 
@@ -166,7 +129,8 @@ restart:
 	@ sudo systemctl restart $(SERVICE_NAME)
 
 deploy: build
-	@ sudo systemctl reload $(SERVICE_NAME)
+	sudo systemctl daemon-reload
+	sudo systemctl reload $(SERVICE_NAME)
 	@ echo --- SERVICE DEPLOYED AND RUNNING ---
 
 ```
@@ -218,7 +182,7 @@ cd hostgator-cpanel-dns-automizer
 go install
 ```
 
-3. **Set up your `/env` folder and environment files** (same as Linux)
+3. **Set up your `.env` file and add your domains to be watch** (same as Linux)
 
 4. **Run it manually:**
 ```bash
@@ -244,7 +208,7 @@ cd hostgator-cpanel-dns-automizer
 go install
 ```
 
-4. **Set up the `/env` folder and `.env` files** like on Linux/macOS.
+4. **Set up your `.env` file and add your domains to be watch** like on Linux/macOS.
 
 5. **Run the app (from Git Bash or terminal):**
 ```bash
@@ -255,10 +219,12 @@ make run
 
 ---
 
-### 🛠 Cross-platform Notes
+### 🛠 Enhancements
 
-- If you run into permission errors, especially with `.env` files, check file/folder access.
-- Environment variables can also be set inline (`ENV=DEV/PROD`) or in shell profiles like `.bashrc`, `.zshrc`, or `.bash_profile`.
+- Support for multiple domains.
+- Environment variables are already set up
+- Plug and Play style setup.
+- Variable watch interval.(you can modify the watch interval from the .env file)
 
 ---
 
