@@ -1,0 +1,10 @@
+{
+    "domain_name" : "your_domain",
+    "main_domain_url" : "your_domain.com",
+    "target_domains" : ["example.your_domain.com.","www.example.your_domain.com."],
+    "auth" : {
+        "username" : "cpanel_username",
+        "token" : "cpanel_token"
+    },
+    "cpanel_port" : 2083 // usually 2083 but check on DNS Zone url
+}

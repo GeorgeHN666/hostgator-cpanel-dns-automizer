@@ -1,6 +1,7 @@
 package DNS
 
 import (
+	"dns-automizer/pkg/PARSER"
 	"fmt"
 )
 
@@ -11,16 +12,19 @@ func StartDNSService() *DNS {
 }
 
 // StartRecordUpdate search for the updated A record lines and updates the new records to the remote DNS registry
-func (d *DNS) StartRecordUpdate(updatedAddr string) error {
+func (d *DNS) StartRecordUpdate(updatedAddr string, entries []*PARSER.DomainEntry) error {
 
-	fmt.Println("--- SEARCHING FOR UPDATED RECORDS ---")
+	for _, domain := range entries {
+		fmt.Printf("--- SEARCHING UPDATED RECORDS FOR %s ---\n", domain.MainDomainUrl)
 
-	records, err := d.getARegistries()
-	if err != nil {
-		return err
+		records, err := d.getARegistries(domain)
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf("--- UPDATING REMOTE A RECORDS FOR %s---\n", domain.MainDomainUrl)
+
+		d.changeRemoteRegistries(records, updatedAddr, domain)
 	}
-
-	fmt.Println("--- UPDATING REMOTE A RECORDS ---")
-
-	return d.changeRemoteRegistries(records, updatedAddr)
+	return nil
 }
